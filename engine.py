@@ -739,8 +739,8 @@ class MuseEngine:
             except Exception:
                 st = {}
             tail = st.get("tail") or ""
-            if re.search(r"||out of credits||token limit", tail):
-                raise MuseGenerationError("Tai khoan")
+            if re.search(r"out of credits|token limit|quota exceeded", tail, re.I):
+                raise MuseGenerationError("Tài khoản đã hết hạn mức (out of credits)")
             # Sidebar/stale connection text does not prove this generation failed.
             # The caller's generation deadline remains the bounded timeout.
 # Muse Studio configuration and operations
