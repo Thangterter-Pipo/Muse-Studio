@@ -55,7 +55,11 @@ async function request(path,{method='GET',body,signal,headers={},timeout=25000,p
     const response=await fetch(apiUrl(path),{method,signal:ctl.signal,headers:{...(state.key?{Authorization:`Bearer ${state.key}`}:{}) ,...(body!==undefined?{'Content-Type':'application/json'}:{}),...headers},...(body===undefined?{}:{body:JSON.stringify(body)})});
     if(plain)return response;
     const payload=await response.json().catch(()=>({}));
-    if(!response.ok){const msg=payload?.error?.message||payload?.detail||`HTTP ${response.status}`;throw new Error(typeof msg==='string'?msg:JSON.stringify(msg));}
+    if(!response.ok){
+      if(response.status===401) throw new Error('Chưa nhập hoặc sai MUSE_STUDIO_KEY. Hãy kiểm tra tab Cài đặt (⚙).');
+      const msg=payload?.error?.message||payload?.detail||`HTTP ${response.status}`;
+      throw new Error(typeof msg==='string'?msg:JSON.stringify(msg));
+    }
     return payload;
   }catch(e){if(e.name==='AbortError'&&signal?.aborted)throw e; if(e.name==='AbortError')throw new Error('Yêu cầu đã quá thời gian chờ');throw e}
   finally{clearTimeout(t)}
@@ -248,10 +252,14 @@ function autoxModal(){
   `<button class="btn" id="modal-cancel">Đóng</button><button class="btn primary" id="autox-start">${icon('eye')} Bắt đầu trích xuất</button>`);
 }
 async function autoxStart(){
+  if(!state.key){
+    toast('Chưa có MUSE_STUDIO_KEY. Hãy vào mục Cài đặt (⚙) nhập khóa trước khi trích xuất.', true);
+    return;
+  }
   const label=($('#autox-label')||{}).value||'';
   const btn=$('#autox-start');if(btn){btn.disabled=true;btn.innerHTML='Đang mở trình duyệt...';}
   try{
-    const d=await post('/admin/accounts/auto-extract/start',{label});
+    const d=await request('/admin/accounts/auto-extract/start',{method:'POST',body:{label},timeout:60000});
     autoxSid=d.sid;
     $('#autox-status').innerHTML=`<div class="notice warning">${icon('clock')} <b>Trình duyệt đã mở.</b> Hãy đăng nhập muse.ai trong cửa sổ vừa mở...<br><span id="autox-prog">Đang chờ đăng nhập (0/4 cookie cốt lõi)</span></div><div class="progress" style="margin-top:10px"><span id="autox-bar" style="width:5%"></span></div>`;
     const foot=$('#modal-layer .modal-footer');

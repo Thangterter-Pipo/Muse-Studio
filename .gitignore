@@ -17,3 +17,4 @@ login_temp_profile/
 *.tmp
 .DS_Store
 Thumbs.db
+data/.cookie_key

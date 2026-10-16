@@ -56,12 +56,22 @@ from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 # và liệt kê domain trong MUSE_STUDIO_CORS_ORIGINS để khóa lại.
 _cors_allow_all = bool(getattr(CFG, "cors_allow_all", True))
 _cors_origins = _origins if _origins else []
-if _cors_allow_all and not _cors_origins:
+if _cors_allow_all:
     _cors_effective = ["*"]
 elif _cors_origins:
     _cors_effective = _cors_origins
 else:
     _cors_effective = ["*"]
+
+# Luôn đảm bảo hỗ trợ các origin local cho giao diện web Muse Studio
+_local_origins = [
+    "http://localhost:18610", "http://127.0.0.1:18610",
+    "http://localhost:3000", "http://127.0.0.1:3000",
+    "http://localhost:8080", "http://127.0.0.1:8080"
+]
+for _lo in _local_origins:
+    if _cors_effective != ["*"] and _lo not in _cors_effective:
+        _cors_effective.append(_lo)
 if not _cors_allow_all and _cors_effective == ["*"]:
     log.warning("CORS đang mở *, hãy đặt MUSE_STUDIO_CORS_ALLOW_ALL=0 và cấu hình MUSE_STUDIO_CORS_ORIGINS khi expose ra internet")
 app.add_middleware(CORSMiddleware,
@@ -1664,13 +1674,56 @@ def _autox_find_chrome() -> str | None:
     cands = []
     if getattr(CFG, "chromium", ""):
         cands.append(CFG.chromium)
-    cands += [
-        "google-chrome", "chrome", "chromium", "chromium-browser",
-        r"C:\Program Files\Google\Chrome\Application\chrome.exe",
-        r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
-        r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+    
+    # 1. Trình duyệt chuẩn PATH
+    cands += ["google-chrome", "chrome", "chromium", "chromium-browser", "msedge", "brave", "coccoc"]
+    
+    # 2. Windows paths phổ biến
+    local_app_data = os.environ.get("LOCALAPPDATA", "")
+    program_files = os.environ.get("ProgramFiles", r"C:\Program Files")
+    program_files_x86 = os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)")
+    
+    win_paths = [
+        # Google Chrome
+        os.path.join(program_files, r"Google\Chrome\Application\chrome.exe"),
+        os.path.join(program_files_x86, r"Google\Chrome\Application\chrome.exe"),
+        os.path.join(local_app_data, r"Google\Chrome\Application\chrome.exe") if local_app_data else None,
+        # Microsoft Edge (cả 64-bit và 32-bit)
+        os.path.join(program_files, r"Microsoft\Edge\Application\msedge.exe"),
+        os.path.join(program_files_x86, r"Microsoft\Edge\Application\msedge.exe"),
+        # Cốc Cốc Browser
+        os.path.join(local_app_data, r"CocCoc\Browser\Application\browser.exe") if local_app_data else None,
+        os.path.join(program_files, r"CocCoc\Browser\Application\browser.exe"),
+        # Brave Browser
+        os.path.join(program_files, r"BraveSoftware\Brave-Browser\Application\brave.exe"),
+        os.path.join(local_app_data, r"BraveSoftware\Brave-Browser\Application\brave.exe") if local_app_data else None,
+        # macOS paths
         "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+        "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser",
     ]
+    cands += [p for p in win_paths if p]
+
+    # 3. Quét Registry Windows nếu có winreg
+    try:
+        import winreg
+        for reg_key in [
+            r"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe",
+            r"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe",
+            r"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\browser.exe",
+            r"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\brave.exe"
+        ]:
+            for root_hkey in [winreg.HKEY_CURRENT_USER, winreg.HKEY_LOCAL_MACHINE]:
+                try:
+                    with winreg.OpenKey(root_hkey, reg_key) as k:
+                        val, _ = winreg.QueryValueEx(k, "")
+                        if val and os.path.isfile(val):
+                            cands.insert(0, val)
+                except Exception:
+                    pass
+    except Exception:
+        pass
+
     for c in cands:
         if c and (os.path.isfile(c) or shutil.which(c)):
             return c
