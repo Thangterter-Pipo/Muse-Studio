@@ -1,0 +1,26 @@
+[Unit]
+Description=musestudio - Muse(muse.ai) web quota reverse proxy
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/opt/musestudio
+Environment=HOME=/home/ubuntu
+Environment=PATH=/snap/bin:/usr/local/bin:/usr/bin:/bin
+Environment=MUSE_STUDIO_HOME=/opt/musestudio
+Environment=MUSE_STUDIO_PORT=18610
+Environment=MUSE_STUDIO_CDP_PORT=19210
+Environment=MUSE_STUDIO_CHROMIUM=/snap/bin/chromium
+Environment=MUSE_STUDIO_HOME_DIR=/home/ubuntu
+EnvironmentFile=-/opt/musestudio/.env
+ExecStart=/opt/musestudio/venv/bin/python -m uvicorn app:app --host 0.0.0.0 --port 18610
+Restart=always
+RestartSec=2
+NoNewPrivileges=true
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target

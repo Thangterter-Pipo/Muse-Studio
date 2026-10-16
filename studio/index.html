@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8fc">
+  <title>Muse Studio · Control Center</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#dashboard" aria-label="Muse Studio home">
+        <span class="brand-icon"><svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M4 20V6l9 8 9-8v14" stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="13" cy="5" r="2.5" fill="#D9FF8E"/></svg></span>
+        <span class="brand-copy"><strong>Muse Studio</strong><small>CREATIVE CONTROL CENTER</small></span>
+      </a>
+      <div class="workspace-select"><span class="workspace-avatar">M</span><span><b>My Workspace</b><small>musestudio backend</small></span><span class="workspace-arrow">⌄</span></div>
+      <div class="nav-label">WORKSPACE</div>
+      <nav id="nav" aria-label="Điều hướng chính">
+        <a data-page="dashboard" href="#dashboard" class="nav-item active"><span data-icon="layout-dashboard"></span><span>Tổng quan</span></a>
+        <a data-page="playground" href="#playground" class="nav-item"><span data-icon="sparkles"></span><span>AI Playground</span><span class="nav-pill">3</span></a>
+        <a data-page="accounts" href="#accounts" class="nav-item"><span data-icon="users"></span><span>Tài khoản Muse</span></a>
+        <a data-page="tasks" href="#tasks" class="nav-item"><span data-icon="list-checks"></span><span>Hàng đợi tác vụ</span></a>
+        <a data-page="media" href="#media" class="nav-item"><span data-icon="images"></span><span>Thư viện media</span></a>
+      </nav>
+      <div class="nav-label nav-label-second">SYSTEM</div>
+      <nav>
+        <a data-page="api" href="#api" class="nav-item"><span data-icon="braces"></span><span>API & kết nối</span></a>
+        <a data-page="settings" href="#settings" class="nav-item"><span data-icon="settings-2"></span><span>Cài đặt</span></a>
+      </nav>
+      <div class="sidebar-bottom">
+        <button class="small-cta" id="btn-donate" style="margin:12px 3px 15px;background:#f0ebff;color:#7155e9;border:1px dashed #d8cdf9;border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700">
+          <span>☕</span> <span>Ủng hộ tác giả (Donate)</span>
+        </button>
+        <div class="profile"><span class="profile-avatar">MS</span><span><strong>Studio Admin</strong><small id="profile-label">Chưa kết nối</small></span><button class="icon-btn subtle" id="profile-settings" aria-label="Cài đặt kết nối"><span data-icon="ellipsis"></span></button></div>
+      </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <div class="main-shell">
+      <header class="topbar">
+        <div class="topbar-left"><button id="menu-toggle" class="icon-btn mobile-menu" aria-label="Mở menu"><span data-icon="menu"></span></button><span class="breadcrumb-root">Workspace</span><span class="breadcrumb-sep">/</span><strong id="breadcrumb">Tổng quan</strong></div>
+        <div class="topbar-right"><div class="connection"><span id="connection-dot" class="live-dot offline"></span><span id="connection-text">Chưa kết nối</span></div><span class="bar-divider"></span><button id="theme-toggle" class="icon-btn theme-toggle" aria-label="Chuyển giao diện sáng/tối"><span data-icon="moon"></span></button><button id="refresh" class="icon-btn" aria-label="Làm mới"><span data-icon="refresh-cw"></span></button><button class="top-avatar" id="top-avatar" title="Cấu hình">MS</button></div>
+      </header>
+      <main id="page-content" tabindex="-1"></main>
+    </div>
+  </div>
+  <div id="toast-layer" class="toast-layer" aria-live="polite"></div>
+  <div id="modal-layer"></div>
+  <script src="./app.js" defer></script>
+</body>
+</html>

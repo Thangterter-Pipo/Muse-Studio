@@ -1,0 +1,11 @@
+{
+  "version": "1.5.8-ui",
+  "updated_at": "2026-10-16",
+  "repo": "",
+  "highlights": [
+    "Viết lại toàn bộ Design System v2: CSS variables, dark mode (nút chuyển trên topbar, lưu localStorage)",
+    "Chuẩn hóa màu sắc (1 accent duy nhất), radius, shadow; animation cho modal/toast/chat; chat có avatar + style code",
+    "Cải thiện layout: sidebar có indicator, topbar blur sticky, bảng có sticky header + hover, thẻ media hover zoom",
+    "Responsive + prefers-reduced-motion + custom scrollbar"
+  ]
+}

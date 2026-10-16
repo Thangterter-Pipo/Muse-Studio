@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  musestudio:
+    build: .
+    image: musestudio:latest
+    container_name: musestudio
+    restart: always
+    ports:
+      - "18610:18610"
+    environment:
+      # Muse Studio internal logic API Muse Studio internal logic Key（Muse Studio internal logic .env Muse Studio internal logic，Muse Studio internal logic）
+      - MUSE_STUDIO_KEY=${MUSE_STUDIO_KEY:-}
+      # Muse Studio internal logic URL，Muse Studio internal logic https://your-domain.com（Muse Studio internal logic）
+      - MUSE_STUDIO_PUBLIC_BASE=
+      # Qua thoi gianMuse Studio internal logic（Muse Studio internal logic）
+      - MUSE_STUDIO_IMAGE_TIMEOUT=240
+      - MUSE_STUDIO_VIDEO_TIMEOUT=600
+      - MUSE_STUDIO_CHAT_TIMEOUT=300
+    volumes:
+      # Muse Studio internal logicTai khoanMuse Studio internal logic、Tac vuMuse Studio internal logic
+      - ./data:/app/data
+    shm_size: '2gb' #  Chromium  /dev/shm 
